@@ -1,164 +1,313 @@
-# Phase 3 — Data Layer & Simulated IoT Telemetry
+Commercial Smart Facility & Sustainability Manager
 
-Airport Smart Facility & Sustainability Command Center — Phase 3 deliverable.
+An airport-focused facility operations prototype that ingests simulated IoT telemetry, detects operational incidents, quantifies water impact, assigns priority, and automatically routes maintenance actions.
 
-This phase builds **only**: Supabase schema, telemetry model, telemetry
-simulator, and ingestion. No dashboard, no AI, no dispatch logic yet
-(those are Phases 4–6).
+What the Prototype Demonstrates
 
-## 1. Tables Created (9)
+The system models a high-footfall airport environment where restroom and facility telemetry is continuously monitored.
 
-| Table | Purpose |
-|---|---|
-| `facilities` | The airport itself |
-| `terminals` | Terminals within the airport |
-| `zones` | Restrooms/zones — carries cleaning threshold + usage accumulator |
-| `sensors` | One combo sensor per zone (flow+occupancy+flush+status) |
-| `telemetry` | Raw high-frequency readings (the core data stream) |
-| `incidents` | Detected leak/threshold/fault events — populated starting Phase 4 |
-| `maintenance_tickets` | Maintenance-team queue — populated starting Phase 4/5 |
-| `cleaning_tasks` | Cleaning-team queue — populated starting Phase 4/5 |
-| `cleaning_verifications` | QR checklist completion record — used starting Phase 5 |
+Core workflow:
 
-Full definitions: `sql/schema.sql`. Demo seed data: `sql/seed.sql`.
+Telemetry → Detection → Impact → Priority → Dispatch → Maintenance Ticket → Command Center
 
-## 2. Important Fields
+The prototype covers:
 
-- `zones.usage_count_since_clean` / `zones.cleaning_threshold_uses` — drives the
-  usage-traffic-based cleaning threshold (no dedicated hygiene sensor, per design).
-- `sensors.status` / `sensors.last_seen_at` — basic sensor health (ONLINE/OFFLINE/FAULT).
-- `telemetry.scenario_tag` — records which simulated scenario produced each row,
-  purely for demo traceability (not a real-world field).
+Continuous water-leak detection
 
-## 3. Files Created
+Estimated water-loss calculation
 
-```
-sql/schema.sql                    Supabase/PostgreSQL table definitions
-sql/seed.sql                      Demo seed data (1 airport, 2 terminals, 4 zones, 4 sensors)
-src/telemetry/telemetryModel.js   Reading shape + validation
-src/telemetry/scenarios.js        NORMAL/HIGH_USAGE/LEAK/CLEANING_THRESHOLD/SENSOR_OFFLINE/RECOVERY generators
-src/telemetry/simulator.js        TelemetrySimulator engine (per-zone scenario state, tick/start/stop)
-src/db/supabaseClient.js          Real Supabase adapter (production path)
-src/db/localMockAdapter.js        Local JSON-file mock adapter (sandbox-testing only, see note below)
-src/ingest/ingestTelemetry.js     Adapter-agnostic ingestion logic
-scripts/runSimulator.js           Run simulator against real Supabase
-scripts/testLocal.js              Run simulator against the local mock adapter
-.env.example                      Supabase credential template
-package.json                      Dependencies (@supabase/supabase-js, dotenv)
-```
+Usage-based cleaning threshold detection
 
-## 4. How to Configure Supabase
+Sensor health / offline monitoring
 
-1. Create a Supabase project at supabase.com.
-2. In the Supabase SQL Editor, run `sql/schema.sql`, then `sql/seed.sql`.
-3. Copy `.env.example` to `.env` and fill in `SUPABASE_URL` and
-   `SUPABASE_SERVICE_KEY` (Settings → API in your Supabase project).
-4. `npm install` (requires network access — not available in this
-   build sandbox, so this step happens on your machine).
+Deterministic incident prioritization
 
-## 5. How to Run the Telemetry Simulator
+Automatic maintenance team routing
 
-**Against real Supabase** (on your machine, after steps above):
-```
-npm run simulate
-```
-This starts a 2-second tick loop across all 4 seeded zones, ingesting
-into your Supabase `telemetry` table continuously.
+Maintenance ticket creation with duplicate prevention
 
-**Locally, with no Supabase/network** (what was used to verify this
-phase in the build sandbox — see Section 8):
-```
-npm run test:local
-```
-This runs the same simulator + ingestion code against a local JSON-file
-mock adapter (`src/db/localMockAdapter.js`) and prints a full
-verification report.
+Airport command-center visualization
 
-## 6. How to Trigger Each Scenario
+Deterministic telemetry simulation for reproducible testing
 
-Scenarios are set per zone at runtime:
-```js
-sim.setScenario('T2-R03', 'LEAK');
-sim.setScenario('T1-R01', 'HIGH_USAGE');
-sim.setScenario('T1-R02', 'CLEANING_THRESHOLD');
-sim.setScenario('T2-R04', 'SENSOR_OFFLINE');
-sim.setScenario('T2-R03', 'RECOVERY');
-```
-Valid zone codes (from seed data): `T1-R01`, `T1-R02`, `T2-R03`, `T2-R04`.
-Valid scenarios: `NORMAL`, `HIGH_USAGE`, `LEAK`, `CLEANING_THRESHOLD`,
-`SENSOR_OFFLINE`, `RECOVERY`.
+Technology Stack
 
-`scripts/runSimulator.js` has a commented-out scripted timeline
-(`setTimeout` calls) you can uncomment to auto-trigger scenarios at
-fixed offsets for a hands-free demo run — this is where you'd wire in
-the golden demo sequence from Phase 1.
+Frontend
 
-## 7. Example Telemetry Record
+React
 
-```json
-{
-  "id": 43,
-  "sensor_id": "87686082-de56-4986-836f-373f5c307604",
-  "zone_id": "1c44b975-9031-493f-8067-c6e7d30b60a5",
-  "recorded_at": "2026-09-17T10:15:32.880Z",
-  "water_flow_lpm": 2.99,
-  "flush_count": 0,
-  "occupancy": 0,
-  "sensor_status": "ONLINE",
-  "scenario_tag": "LEAK"
-}
-```
-Note the leak signature: elevated flow with zero occupancy/flush — no
-legitimate usage explains the water flowing.
+Vite
 
-## 8. Test Results
+Tailwind CSS
 
-Run in the build sandbox via `node scripts/testLocal.js` (local mock
-adapter — see note in Section 9 on why). 160 readings generated across
-4 zones and all 6 scenarios, then ingested and verified:
+Recharts
 
-```
-[PASS] Data generated — 160 rows
-[PASS] Multiple terminals present — T1, T2
-[PASS] Multiple zones present — 4 zones
-[PASS] Multiple sensors present — 4 sensors
-[PASS] All 6 scenarios represented — NORMAL, HIGH_USAGE, LEAK, CLEANING_THRESHOLD, SENSOR_OFFLINE, RECOVERY
-[PASS] Leak scenario shows sustained flow with low occupancy — 25 leak rows, sample flow=2.99, occ=0
-[PASS] Cleaning threshold accumulator increased — usage_count_since_clean=238 (threshold=100)
-[PASS] Sensor offline correctly recorded — 4 OFFLINE rows
-[PASS] Sensor status field updated to ONLINE after recovery — current status=ONLINE
-[PASS] Timestamps valid and non-decreasing overall — 160 timestamps checked
-[PASS] No ingestion errors — 0 errors / 160 ingested
+Lucide React
 
-Overall: ALL CHECKS PASSED
-```
+Backend
 
-This confirms: telemetry generation works, ingestion logic works,
-scenario switching works per-zone, timestamps are valid, multiple
-zones/terminals work simultaneously, offline sensors are represented
-correctly, and recovery restores normal readings and ONLINE status.
+Node.js
 
-## 9. Problems Encountered / Important Note
+Express.js
 
-**This build sandbox has no network access**, so two things could not
-be done here and are left for you to do on your own machine:
-- `npm install` (to fetch `@supabase/supabase-js` and `dotenv`)
-- An actual connection test against a real Supabase project
+Database
 
-To make Phase 3 fully verifiable anyway, a **local mock adapter**
-(`src/db/localMockAdapter.js`) was built that implements the exact
-same interface as the real Supabase adapter (`getZoneByCode`,
-`getSensorByCode`, `insertTelemetry`, `updateSensorStatus`,
-`updateZoneUsage`). The simulator and ingestion logic are
-**adapter-agnostic** — `scripts/testLocal.js` proves the logic works
-end-to-end, and `scripts/runSimulator.js` runs the identical logic
-against real Supabase once you supply credentials and run `npm
-install` on your machine. No application logic differs between the two
-paths — only which adapter is injected.
+Supabase
 
-No other issues encountered. Logic-level testing found zero errors
-across 160 ingested readings spanning all required scenarios.
+PostgreSQL
 
----
+Data Generation
 
-**PHASE 3 COMPLETE — TELEMETRY FOUNDATION WORKING.**
+Deterministic synthetic telemetry simulator
+
+Scenario-based test data
+
+No physical IoT hardware is required to run this prototype.
+
+Repository Structure
+
+project/
+├── frontend/              # React + Vite dashboard
+├── backend/               # Node.js + Express API
+├── simulator/             # Deterministic telemetry generation
+├── database/              # SQL/schema/setup files, if included
+├── .env.example           # Environment variable template
+└── README.md              # Project documentation and run instructions
+
+Folder names may vary slightly depending on the final repository structure. The key requirement is that the frontend, backend, simulator, and database setup remain clearly separated.
+
+Prerequisites
+
+Install the following before running the project:
+
+Node.js 18+ recommended
+
+npm
+
+A Supabase project
+
+A modern web browser
+
+Environment Variables
+
+Create the required .env files from the provided .env.example template.
+
+Example backend configuration:
+
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_key
+PORT=3000
+
+Do not commit real credentials, API keys, or .env files to GitHub.
+
+Database Setup
+
+Create a Supabase project.
+
+Open the Supabase SQL Editor.
+
+Run the SQL/schema files included in the repository.
+
+Confirm that the telemetry, incidents, maintenance tickets, cleaning, sensor, and water-impact data required by the application are available.
+
+Add the Supabase credentials to the backend environment file.
+
+Run the Backend
+
+Open a terminal in the backend directory:
+
+cd backend
+npm install
+npm start
+
+The API is expected to run on:
+
+http://localhost:3000
+
+Run the Frontend
+
+Open a second terminal:
+
+cd frontend
+npm install
+npm run dev
+
+Vite will provide a local development URL, normally similar to:
+
+http://localhost:5173
+
+Open the displayed URL in a browser.
+
+Run the Telemetry Simulator
+
+The simulator generates deterministic telemetry for reproducible demonstrations and testing.
+
+The supported scenarios include:
+
+NORMAL
+
+HIGH_USAGE
+
+LEAK
+
+CLEANING_THRESHOLD
+
+SENSOR_OFFLINE
+
+RECOVERY
+
+Run the simulator using the project script provided in the simulator/backend directory. For example:
+
+node simulator.js
+
+If the final repository uses a different simulator entry file, use the corresponding script documented beside that file.
+
+Simulator Limit
+
+The simulator is capped at 500 telemetry records per run so a demonstration run stops automatically.
+
+This is not a database-wide limit. The database can retain more than 500 records.
+
+Demo Scenario
+
+A typical run demonstrates a continuous water leak in an airport restroom zone.
+
+Example incident values:
+
+Location: Terminal 2 — Restroom Zone A
+Priority: CRITICAL
+Sustained Flow Rate: 12.4 L/min
+Leak Duration: 42 min
+Estimated Water Loss: 520 L
+Recommended Action: Inspect fixture & supply line shutoff valve
+Assigned Team: Facilities / Plumbing Maintenance
+
+The system derives the incident from telemetry behaviour rather than relying on the scenario label itself.
+
+Detection Logic
+
+Continuous Water Leak
+
+A leak is detected from sustained elevated water flow combined with operational context such as occupancy/usage conditions and persistence over time.
+
+Water Impact
+
+Estimated wastage is calculated from the observed flow rate and incident duration.
+
+Example:
+
+12.4 L/min × 42 min ≈ 520 L
+
+Cleaning Threshold
+
+Cleaning requirements are based on actual restroom usage/flush activity rather than treating instantaneous occupancy as completed usage.
+
+Sensor Health
+
+Sensor health tracks telemetry/sensor operational status, including offline and recovery states.
+
+Priority
+
+Priority is deterministic and based on operational factors such as:
+
+Incident severity
+
+Persistence/duration
+
+Water impact
+
+Occupancy/traffic context
+
+Sensor health
+
+Possible priority levels:
+
+LOW / MEDIUM / HIGH / CRITICAL
+
+Dispatch
+
+Detected incidents are mapped to the appropriate facility team and recommended action.
+
+Examples:
+
+WATER_LEAK            → Facilities / Plumbing Maintenance
+CLEANING_THRESHOLD    → Cleaning
+SENSOR_OFFLINE        → Maintenance
+
+Backend API
+
+The backend exposes operational data for the dashboard through endpoints including:
+
+GET /api/dashboard/summary
+GET /api/telemetry
+GET /api/incidents
+GET /api/tickets
+GET /api/cleaning
+GET /api/sensors
+GET /api/water
+
+The frontend uses these APIs to display the current operational state.
+
+Data & Reliability Approach
+
+The core detection, impact calculation, prioritization, and dispatch logic is deterministic.
+
+This makes the prototype:
+
+Reproducible
+
+Explainable
+
+Easy to test
+
+Independent of an LLM for critical operational decisions
+
+AI/LLM functionality is not required for the core incident pipeline.
+
+Security Notes
+
+Keep .env files out of source control.
+
+Never commit Supabase credentials or other secrets.
+
+Use .env.example for required configuration names only.
+
+Avoid storing local mock database files in Git.
+
+Quick Start
+
+# Terminal 1
+cd backend
+npm install
+npm start
+
+# Terminal 2
+cd frontend
+npm install
+npm run dev
+
+# Terminal 3
+# Run the telemetry simulator using the repository's simulator entry point
+node simulator.js
+
+Then open the frontend URL shown by Vite.
+
+Expected Result
+
+After the system is running and telemetry is ingested, the dashboard should surface operational information such as:
+
+Telemetry
+   ↓
+Incident Detection
+   ↓
+Water Impact
+   ↓
+Priority
+   ↓
+Team Routing
+   ↓
+Maintenance Ticket
+   ↓
+Command Center
+
+The prototype is intended to demonstrate how existing facility telemetry can be converted into actionable maintenance operations and measurable water stewardship.
