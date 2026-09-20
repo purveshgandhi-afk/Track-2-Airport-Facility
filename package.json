@@ -1,0 +1,20 @@
+{
+  "name": "airport-smart-facility-phase3",
+  "version": "0.1.0",
+  "description": "Phase 3 data layer + simulated IoT telemetry for the Airport Smart Facility & Sustainability Command Center prototype",
+  "main": "scripts/runSimulator.js",
+  "scripts": {
+    "simulate": "node scripts/runSimulator.js",
+    "test:local": "node scripts/testLocal.js",
+    "start": "node src/api/server.js",
+    "api": "node src/api/server.js",
+    "test:api": "node scripts/testApi.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1"
+  },
+  "license": "UNLICENSED"
+}

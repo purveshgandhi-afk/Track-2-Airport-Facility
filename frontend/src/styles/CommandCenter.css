@@ -1,0 +1,784 @@
+/* ==========================================================
+   COMMAND CENTER STYLES
+   Airport Operations Console — Indira Gandhi International Airport
+   ========================================================== */
+
+/* ── Page Root ───────────────────────────────────────────── */
+.cc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Page Header ─────────────────────────────────────────── */
+.cc-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cc-page-head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cc-pre-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.cc-heading {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.cc-page-head-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.cc-facility-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cc-system-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+/* ── Operations KPI Console (Hierarchical, Anti-AI) ──────── */
+.cc-kpi-console {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 14px;
+}
+
+/* Primary Operational Alert Metrics */
+.cc-kpi-primary-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cc-kpi-primary-cell {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+}
+
+.cc-kpi-primary-cell:first-child {
+  border-right: 1px solid var(--color-border);
+}
+
+.cc-kpi-primary-cell--alert {
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.cc-kpi-primary-cell--alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-danger);
+}
+
+/* Secondary Operational Telemetry Metrics */
+.cc-kpi-secondary-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cc-kpi-secondary-cell {
+  padding: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  border-right: 1px solid var(--color-border);
+}
+
+.cc-kpi-secondary-cell:last-child {
+  border-right: none;
+}
+
+/* Shared Metric Typography within Console */
+.cc-metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cc-metric-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  white-space: nowrap;
+}
+
+.cc-metric-body {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.cc-metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.cc-metric-value--primary {
+  font-size: 2rem;
+}
+
+.cc-metric-value--danger {
+  color: var(--color-danger);
+}
+
+.cc-metric-value--warn {
+  color: var(--color-warn);
+}
+
+.cc-metric-unit {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-muted);
+  margin-left: 2px;
+}
+
+.cc-metric-sub {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cc-metric-sub--alert {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* ── Critical Incident Alert Banner ──────────────────────── */
+.crit-alert {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-left: 3px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.03);
+  overflow: hidden;
+}
+
+.crit-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: rgba(239, 68, 68, 0.06);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.16);
+  gap: 12px;
+}
+
+.crit-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crit-ref-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-danger);
+}
+
+.crit-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.crit-header-block {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.crit-type {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.crit-loc {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.crit-priority-badge {
+  flex-shrink: 0;
+}
+
+.crit-desc {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+.crit-metrics {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  row-gap: 12px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+.crit-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 24px;
+}
+
+.crit-metric-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+  margin-right: 24px;
+  flex-shrink: 0;
+}
+
+.crit-metric-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+.crit-metric-val {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.crit-metric-val--danger {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  background: var(--color-danger);
+  color: #ffffff;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.25);
+  transition: background-color 120ms ease, transform 80ms ease;
+}
+
+.btn-primary-danger:hover {
+  background: #dc2626;
+}
+
+.btn-primary-danger:active {
+  background: #b91c1c;
+  transform: translateY(1px);
+}
+
+.btn-primary-danger:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.btn-ghost-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-surface-hi);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.btn-ghost-sm:hover {
+  background: var(--color-border);
+  border-color: var(--color-border-hi);
+  color: var(--color-ink);
+}
+
+.btn-ghost-sm:active {
+  background: var(--color-border-hi);
+  transform: translateY(1px);
+}
+
+.btn-ghost-sm:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ── Main Body Grid ──────────────────────────────────────── */
+.cc-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+.cc-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cc-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Facility Status Section ─────────────────────────────── */
+.facility-terminals {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.terminal-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.terminal-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 2px;
+}
+
+.terminal-code-tag {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.terminal-full-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+.zone-table-wrap {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.zone-table {
+  width: 100%;
+}
+
+.zone-row {
+  cursor: default;
+}
+
+.zone-row td {
+  transition: background-color 120ms ease;
+}
+
+.zone-row:hover td {
+  background: var(--color-surface-hi) !important;
+}
+
+.zone-row--crit td {
+  background: rgba(239, 68, 68, 0.04) !important;
+}
+
+.zone-row--crit:hover td {
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.zone-code-mono {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+  letter-spacing: 0.03em;
+}
+
+.zone-subname {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-faint);
+  margin-top: 1px;
+}
+
+.zone-status-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.zone-status-lbl {
+  font-size: var(--text-sm);
+}
+
+.zs-normal {
+  color: var(--color-muted);
+}
+
+.zs-warn {
+  color: var(--color-warn);
+}
+
+.zs-danger {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.zs-muted {
+  color: var(--color-faint);
+}
+
+.td-num {
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.td-null {
+  color: var(--color-faint);
+}
+
+.flow-val {
+  color: var(--color-muted);
+}
+
+.flow-val--crit {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* ── Panels (Right Rail) ─────────────────────────────────── */
+/* P1-9, P1-10: Clean panel without nested outer/inner border stacking */
+.cc-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mono-sm {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.issue-text {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+/* ── Maintenance Preview List (Compact Ops List) ─────────── */
+.maint-ticket-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.maint-ticket-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.maint-ticket-item:first-child {
+  padding-top: 0;
+}
+
+.maint-ticket-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.maint-ticket-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.maint-ticket-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.maint-ticket-sep {
+  color: var(--color-border-hi);
+  font-size: var(--text-xs);
+}
+
+.maint-ticket-zone {
+  color: var(--color-ink);
+  background: var(--color-surface-hi);
+  padding: 1px 5px;
+  border-radius: 2px;
+  border: 1px solid var(--color-border);
+}
+
+.maint-ticket-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.maint-ticket-issue {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Sustainability Summary ──────────────────────────────── */
+/* P1-9: Drop the redundant nested border box, use clean list dividers */
+.sustain-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sustain-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sustain-row:first-child {
+  padding-top: 0;
+}
+
+.sustain-row:last-child {
+  border-bottom: none;
+}
+
+.sustain-lbl {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.sustain-val {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sustain-val--warn {
+  color: var(--color-warn);
+}
+
+.sustain-val--danger {
+  color: var(--color-danger);
+}
+
+.sustain-bar-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+.sustain-bar-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sustain-bar-lbl {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-faint);
+  text-transform: uppercase;
+}
+
+.sustain-bar-pct {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-warn);
+  font-variant-numeric: tabular-nums;
+}
+
+.sustain-note {
+  font-size: var(--text-xs);
+  color: var(--color-faint);
+  line-height: 1.4;
+}
+
+/* ── Responsive Adaptations ──────────────────────────────── */
+@media (max-width: 1400px) {
+  .cc-kpi-console {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cc-body-grid {
+    grid-template-columns: 1fr;
+  }
+  .cc-col-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 850px) {
+  .cc-kpi-secondary-group {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cc-kpi-secondary-cell:nth-child(2) {
+    border-right: none;
+  }
+  .cc-kpi-secondary-cell:nth-child(1),
+  .cc-kpi-secondary-cell:nth-child(2) {
+    border-bottom: 1px solid var(--color-border);
+  }
+}
+
+@media (max-width: 768px) {
+  .cc-page-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .cc-page-head-right {
+    align-items: flex-start;
+    text-align: left;
+  }
+  .cc-kpi-primary-group {
+    grid-template-columns: 1fr;
+  }
+  .cc-kpi-primary-cell:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .crit-metrics {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .crit-metric-divider {
+    display: none;
+  }
+  .cc-col-right {
+    grid-template-columns: 1fr;
+  }
+  /* Hide occupancy on narrow mobile to keep table dense and legible */
+  .zone-table th:nth-child(4),
+  .zone-table td:nth-child(4) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .cc-kpi-secondary-group {
+    grid-template-columns: 1fr;
+  }
+  .cc-kpi-secondary-cell {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .cc-kpi-secondary-cell:last-child {
+    border-bottom: none;
+  }
+}

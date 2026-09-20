@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "./styles/components.css";
+@import "./styles/layout.css";
+
+/* --- Design Tokens ------------------------------------------------ */
+:root {
+  /* Surfaces */
+  --color-bg:          #0A0A0A;
+  --color-surface:     #111111;
+  --color-surface-hi:  #1A1A1A;
+  --color-border:      #2A2A2A;
+  --color-border-hi:   #3A3A3A;
+
+  /* Typography */
+  --color-ink:         #F5F5F0;
+  --color-muted:       #A0A09A;
+  --color-faint:       #5A5A56;
+
+  /* Operational status - ONLY for live operational states */
+  --color-ok:          #22C55E;
+  --color-warn:        #F59E0B;
+  --color-danger:      #EF4444;
+
+  /* Brand accent - restrained use */
+  --color-accent:      #C8A96E;
+  --color-accent-sub:  #1E1A14;
+
+  /* Layout */
+  --sidebar-width:     240px;
+  --sidebar-collapsed: 64px;
+  --header-height:     56px;
+
+  /* Typography scale */
+  --text-xs:   0.6875rem;
+  --text-sm:   0.75rem;
+  --text-base: 0.875rem;
+  --text-md:   1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.5rem;
+  --text-2xl:  2rem;
+
+  /* Radius */
+  --radius-sm:   4px;
+  --radius-base: 6px;
+  --radius-md:   8px;
+}
+
+/* --- Base Reset -------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  min-height: 100dvh;
+}
+
+/* --- Scrollbar --------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hi);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* --- Typography Utilities ---------------------------------------- */
+.label-xs {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+.label-sm {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* --- Focus Ring -------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* --- Link Reset -------------------------------------------------- */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* --- Table Base -------------------------------------------------- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+td {
+  font-size: var(--text-base);
+  color: var(--color-ink);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background-color: var(--color-surface-hi);
+}
+
+/* --- Tailwind Custom Theme (v4 inline) --------------------------- */
+@theme {
+  --color-bg: #0A0A0A;
+  --color-surface: #111111;
+  --color-surface-hi: #1A1A1A;
+  --color-border: #2A2A2A;
+  --color-border-hi: #3A3A3A;
+  --color-ink: #F5F5F0;
+  --color-muted: #A0A09A;
+  --color-faint: #5A5A56;
+  --color-ok: #22C55E;
+  --color-warn: #F59E0B;
+  --color-danger: #EF4444;
+  --color-accent: #C8A96E;
+  --color-accent-sub: #1E1A14;
+  --font-family-sans: 'Inter', 'SF Pro Display', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
