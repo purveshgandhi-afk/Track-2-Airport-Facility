@@ -4,7 +4,7 @@
 
 ### Real-time IoT monitoring & predictive maintenance dispatch for high-footfall commercial facilities
 
-**KOHLER Track 2 — Airport Prototype**
+**Track 2 — Airport Prototype**
 
 [![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=white)](https://react.dev/)
@@ -19,7 +19,7 @@
 
 ## Overview
 
-**Commercial Smart Facility & Sustainability Manager** is an airport-focused facility-operations prototype built for KOHLER Track 2. It ingests simulated high-frequency IoT telemetry from an airport restroom environment, detects operational incidents in real time, quantifies water impact, assigns a deterministic priority, and automatically routes the correct facility team via an auto-generated maintenance ticket — all surfaced on a live command-center dashboard.
+**Commercial Smart Facility & Sustainability Manager** is an airport-focused facility-operations prototype built for Track 2. It ingests simulated high-frequency IoT telemetry from an airport restroom environment, detects operational incidents in real time, quantifies water impact, assigns a deterministic priority, and automatically routes the correct facility team via an auto-generated maintenance ticket — all surfaced on a live command-center dashboard.
 
 The system models a **high-footfall airport environment**, where restroom and facility telemetry (water flow, flush activity, occupancy, and sensor health) is continuously monitored, evaluated, and acted on without manual inspection rounds or complaint-driven maintenance.
 
@@ -289,7 +289,7 @@ The prototype demonstrates how existing facility telemetry can be converted into
 
 ## Submission Artifact — Working Model
 
-This repository is the **Working Model** submission artifact for KOHLER Track 2:
+This repository is the **Working Model** submission artifact for Track 2:
 
 > Source code and instructions/scripts to run the individual functional prototype.
 
@@ -299,6 +299,6 @@ All source code, run instructions, and the telemetry simulator required to repro
 
 <div align="center">
 
-Built for the KOHLER Track 2 submission — synthetic/prototype data only, no real airport deployment.
+Built for the Track 2 submission — synthetic/prototype data only, no real airport deployment.
 
 </div>
