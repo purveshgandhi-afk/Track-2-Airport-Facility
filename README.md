@@ -9,7 +9,7 @@
 [![Node](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase%20%2F%20PostgreSQL-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![License](https://img.shields.io/badge/status-hackathon%20prototype-blueviolet)]()
+[![License](https://img.shields.io/badge/status-Track2%20prototype-blueviolet)]()
 
 [Overview](#overview) • [Demo Scenario](#demo-scenario) • [Architecture](#architecture) • [Quick Start](#quick-start) • [API Reference](#backend-api-reference) • [Detection Logic](#detection-logic)
 
