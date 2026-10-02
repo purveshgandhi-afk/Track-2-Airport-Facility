@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { to: '/telemetry',      icon: Activity,        label: 'Live Telemetry',  id: 'nav-telemetry'       },
   { to: '/incidents',      icon: AlertTriangle,   label: 'Incidents',       id: 'nav-incidents'       },
   { to: '/maintenance',    icon: Wrench,          label: 'Maintenance',     id: 'nav-maintenance'     },
-  { to: '/cleaning',       icon: Sparkles,        label: 'Cleaning',        id: 'nav-cleaning'        },
+  { to: '/cleaning',       icon: Sparkles,        label: 'Hygiene',         id: 'nav-cleaning'        },
   { to: '/sustainability', icon: Leaf,            label: 'Sustainability',  id: 'nav-sustainability'  },
   { to: '/sensors',        icon: Wifi,            label: 'Sensor Health',   id: 'nav-sensors'         },
 ];

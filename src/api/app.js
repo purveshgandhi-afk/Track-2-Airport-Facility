@@ -12,10 +12,13 @@ const cors = require('cors');
 const dashboardRouter = require('./routes/dashboard');
 const telemetryRouter = require('./routes/telemetry');
 const incidentsRouter = require('./routes/incidents');
+const incidentAnalyticsRouter = require('./routes/incidentAnalytics');
 const ticketsRouter = require('./routes/tickets');
 const cleaningRouter = require('./routes/cleaning');
+const cleaningAnalyticsRouter = require('./routes/cleaningAnalytics');
 const sensorsRouter = require('./routes/sensors');
 const waterRouter = require('./routes/water');
+const waterAnalyticsRouter = require('./routes/waterAnalytics');
 const zonesRouter = require('./routes/zones');
 
 const app = express();
@@ -27,10 +30,13 @@ app.use(express.json());
 // API Routes
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/telemetry', telemetryRouter);
+app.use('/api/incidents/analytics', incidentAnalyticsRouter);
 app.use('/api/incidents', incidentsRouter);
 app.use('/api/tickets', ticketsRouter);
+app.use('/api/cleaning/analytics', cleaningAnalyticsRouter);
 app.use('/api/cleaning', cleaningRouter);
 app.use('/api/sensors', sensorsRouter);
+app.use('/api/water/analytics', waterAnalyticsRouter);
 app.use('/api/water', waterRouter);
 app.use('/api/zones', zonesRouter);
 

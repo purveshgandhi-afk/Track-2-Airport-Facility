@@ -21,6 +21,11 @@ import { useZones } from '../hooks/useZones';
 import { useIncidents } from '../hooks/useIncidents';
 import { useTickets } from '../hooks/useTickets';
 import { useWater } from '../hooks/useWater';
+import { useWaterAnalytics } from '../hooks/useWaterAnalytics';
+import WaterAnalytics from '../components/WaterAnalytics';
+import IncidentAnalytics from '../components/IncidentAnalytics';
+import CleaningAnalytics from '../components/CleaningAnalytics';
+import MaintenanceAnalytics from '../components/MaintenanceAnalytics';
 import '../styles/CommandCenter.css';
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -50,7 +55,7 @@ function ticketStatusVariant(s) {
   return 'neutral';
 }
 
-// ─── OPERATIONS KPI CONSOLE ───────────────────────────────────────────────────
+// ─── OPERATIONS KPI STRIP (5-COLUMN 20% GRID) ─────────────────────────────────
 function KpiConsole({ dashboard, water }) {
   const waterUsedLiters   = dashboard?.estimated_water_used_liters ?? 0;
   const waterWastedLiters = dashboard?.water_impact?.total_wasted_liters ?? 0;
@@ -60,7 +65,6 @@ function KpiConsole({ dashboard, water }) {
   const sensorsOnline     = dashboard?.online_sensors ?? 0;
   const sensorsOffline    = dashboard?.offline_sensors ?? 0;
   const sensorsTotal      = sensorsOnline + sensorsOffline;
-  const activeDispatches  = dashboard?.active_maintenance_tickets ?? 0;
 
   const wastePct = waterUsedLiters > 0
     ? ((waterWastedLiters / waterUsedLiters) * 100).toFixed(1)
@@ -68,146 +72,237 @@ function KpiConsole({ dashboard, water }) {
   const usedKl = (waterUsedLiters / 1000).toFixed(2);
 
   return (
-    <div className="cc-kpi-console" role="region" aria-label="Operational telemetry summary">
-      {/* Primary Alert Group: Urgent operational anomalies */}
-      <div className="cc-kpi-primary-group">
-        <div className="cc-kpi-primary-cell cc-kpi-primary-cell--alert">
-          <div className="cc-metric-header">
-            <span className="cc-metric-label">Critical Incidents</span>
-            <Badge variant="danger">ACTIVE</Badge>
-          </div>
-          <div className="cc-metric-body">
-            <span className="cc-metric-value cc-metric-value--primary cc-metric-value--danger">
-              {criticalIncidents}
-            </span>
-            <span className="cc-metric-unit">of {activeIncidents} total</span>
-          </div>
-          <div className="cc-metric-sub cc-metric-sub--alert">
-            Immediate technician dispatch required
-          </div>
+    <div className="cc-kpi-grid-5" role="region" aria-label="Operational telemetry summary">
+      {/* 1. Critical Incidents */}
+      <div className={`cc-kpi-card ${criticalIncidents > 0 ? 'cc-kpi-card--alert' : ''}`}>
+        <div className="cc-metric-header">
+          <span className="cc-metric-label">Critical Incidents</span>
+          <Badge variant={criticalIncidents > 0 ? 'danger' : 'ok'}>
+            {criticalIncidents > 0 ? 'ACTIVE' : 'NOMINAL'}
+          </Badge>
         </div>
-
-        <div className="cc-kpi-primary-cell cc-kpi-primary-cell--alert">
-          <div className="cc-metric-header">
-            <span className="cc-metric-label">Estimated Wastage</span>
-            <Badge variant="warn">{wastePct}% LOSS</Badge>
-          </div>
-          <div className="cc-metric-body">
-            <span className="cc-metric-value cc-metric-value--primary cc-metric-value--danger">
-              {waterWastedLiters.toLocaleString()}
-            </span>
-            <span className="cc-metric-unit">L</span>
-          </div>
-          <div className="cc-metric-sub">
-            Exceeds daily conservation threshold (&lt;5%)
-          </div>
+        <div className="cc-metric-body">
+          <span className={`cc-metric-value cc-metric-value--primary ${criticalIncidents > 0 ? 'cc-metric-value--danger' : ''}`}>
+            {criticalIncidents}
+          </span>
+          <span className="cc-metric-unit">of {activeIncidents} total</span>
+        </div>
+        <div className={`cc-metric-sub ${criticalIncidents > 0 ? 'cc-metric-sub--alert' : ''}`}>
+          {criticalIncidents > 0 ? 'Immediate technician dispatch' : 'No active critical alerts'}
         </div>
       </div>
 
-      {/* Secondary Telemetry Group: Facility-wide volume and status */}
-      <div className="cc-kpi-secondary-group">
-        <div className="cc-kpi-secondary-cell">
+      {/* 2. Water Usage */}
+      <div className="cc-kpi-card">
+        <div className="cc-metric-header">
           <span className="cc-metric-label">Water Usage</span>
-          <div className="cc-metric-body">
-            <span className="cc-metric-value">{usedKl}</span>
-            <span className="cc-metric-unit">kL</span>
-          </div>
-          <span className="cc-metric-sub">Daily consumption</span>
+          <Badge variant="neutral">DAILY</Badge>
         </div>
-
-        <div className="cc-kpi-secondary-cell">
-          <span className="cc-metric-label">Restroom Usage</span>
-          <div className="cc-metric-body">
-            <span className="cc-metric-value">{flushCountToday.toLocaleString()}</span>
-          </div>
-          <span className="cc-metric-sub">Flushes recorded</span>
+        <div className="cc-metric-body">
+          <span className="cc-metric-value">{usedKl}</span>
+          <span className="cc-metric-unit">kL</span>
         </div>
+        <div className="cc-metric-sub">Daily facility consumption</div>
+      </div>
 
-        <div className="cc-kpi-secondary-cell">
-          <span className="cc-metric-label">Sensor Health</span>
-          <div className="cc-metric-body">
-            <span className={`cc-metric-value ${sensorsOffline > 0 ? 'cc-metric-value--warn' : ''}`}>
-              {sensorsOnline}
-            </span>
-            <span className="cc-metric-unit">/ {sensorsTotal}</span>
-          </div>
-          <span className="cc-metric-sub">
-            {sensorsOffline > 0 ? `${sensorsOffline} offline` : 'All nominal'}
+      {/* 3. Estimated Wastage */}
+      <div className="cc-kpi-card">
+        <div className="cc-metric-header">
+          <span className="cc-metric-label">Estimated Wastage</span>
+          <Badge variant={Number(wastePct) > 5 ? 'warn' : 'ok'}>{wastePct}% LOSS</Badge>
+        </div>
+        <div className="cc-metric-body">
+          <span className={`cc-metric-value ${Number(wastePct) > 5 ? 'cc-metric-value--warn' : ''}`}>
+            {waterWastedLiters.toLocaleString()}
           </span>
+          <span className="cc-metric-unit">L</span>
         </div>
+        <div className="cc-metric-sub">
+          {Number(wastePct) > 5 ? 'Exceeds daily target (<5%)' : 'Within conservation target'}
+        </div>
+      </div>
 
-        <div className="cc-kpi-secondary-cell">
-          <span className="cc-metric-label">Active Dispatches</span>
-          <div className="cc-metric-body">
-            <span className="cc-metric-value">{activeDispatches}</span>
-          </div>
-          <span className="cc-metric-sub">Plumbing &amp; sanitation</span>
+      {/* 4. Restroom Usage */}
+      <div className="cc-kpi-card">
+        <div className="cc-metric-header">
+          <span className="cc-metric-label">Restroom Usage</span>
+          <Badge variant="neutral">HYGIENE</Badge>
+        </div>
+        <div className="cc-metric-body">
+          <span className="cc-metric-value">{flushCountToday.toLocaleString()}</span>
+          <span className="cc-metric-unit">flushes</span>
+        </div>
+        <div className="cc-metric-sub">Total activations today</div>
+      </div>
+
+      {/* 5. Sensor Health */}
+      <div className="cc-kpi-card">
+        <div className="cc-metric-header">
+          <span className="cc-metric-label">Sensor Health</span>
+          <Badge variant={sensorsOffline > 0 ? 'warn' : 'ok'}>
+            {sensorsOffline > 0 ? `${sensorsOffline} OFFLINE` : '100% ONLINE'}
+          </Badge>
+        </div>
+        <div className="cc-metric-body">
+          <span className={`cc-metric-value ${sensorsOffline > 0 ? 'cc-metric-value--warn' : ''}`}>
+            {sensorsOnline}
+          </span>
+          <span className="cc-metric-unit">/ {sensorsTotal}</span>
+        </div>
+        <div className="cc-metric-sub">
+          {sensorsOffline > 0 ? `${sensorsOffline} sensors offline` : 'All telemetry nodes nominal'}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── CRITICAL INCIDENT ALERT ──────────────────────────────────────────────────
-function CriticalAlert({ incident, onView }) {
-  if (!incident) return null;
-
-  const details = incident.details || {};
+// ─── PRIMARY OPERATIONS (65% CRITICAL INCIDENT / 35% ACTIVE DISPATCH) ───────
+function PrimaryOperations({ incident, ticket, onViewIncident, onViewDispatch }) {
+  const details = incident?.details || {};
   const durationMin = details.duration_min || null;
 
   return (
-    <div className="crit-alert" role="alert" aria-label="Critical incident: continuous water leak">
-      <div className="crit-topbar">
-        <div className="crit-topbar-left">
-          <StatusDot status="danger" label="Active critical incident" />
-          <span className="crit-ref-label">CRITICAL ALARM · {incident.incident_id?.slice(0, 8).toUpperCase() ?? 'UNKNOWN'}</span>
-        </div>
-        <button
-          id="cmd-view-incident-btn"
-          className="btn-primary-danger"
-          onClick={onView}
-          aria-label="View incident details"
-        >
-          View Incident
-          <ChevronRight size={14} strokeWidth={2} aria-hidden="true" />
-        </button>
-      </div>
-
-      <div className="crit-body">
-        <div className="crit-header-block">
-          <div>
-            <div className="crit-type">{incident.type?.toUpperCase() ?? 'LEAK'}</div>
-            <div className="crit-loc">
-              {incident.zone?.name ?? 'Unknown Zone'} · Sensor: {incident.zone?.code ?? '—'}
-            </div>
-          </div>
-          <div className="crit-priority-badge">
-            <Badge variant="danger">PRIORITY 1</Badge>
-          </div>
-        </div>
-
-        <div className="crit-metrics">
-          <div className="crit-metric">
-            <span className="crit-metric-lbl">Flow Rate</span>
-            <span className="crit-metric-val">{details.avg_flow_lpm ?? '—'} L/min</span>
-          </div>
-          <div className="crit-metric-divider" aria-hidden="true" />
-          <div className="crit-metric">
-            <span className="crit-metric-lbl">Duration</span>
-            <span className="crit-metric-val">{fmtDuration(durationMin)}</span>
-          </div>
-          <div className="crit-metric-divider" aria-hidden="true" />
-          <div className="crit-metric">
-            <span className="crit-metric-lbl">Est. Water Loss</span>
-            <span className="crit-metric-val crit-metric-val--danger">
-              {details.estimated_liters ?? details.wasted_liters ?? '—'} L
+    <div className="cc-primary-ops" role="region" aria-label="Primary operations: Urgent attention">
+      {/* 65%: Critical Incident / active operational issue */}
+      <div className="po-incident-card" role="alert" aria-label="Critical operational issue">
+        <div className="crit-topbar">
+          <div className="crit-topbar-left">
+            <StatusDot status={incident ? 'danger' : 'ok'} label="Active critical incident" />
+            <span className="crit-ref-label">
+              {incident
+                ? `CRITICAL ALARM · ${incident.incident_id?.slice(0, 8).toUpperCase() ?? 'ACTIVE'}`
+                : 'OPERATIONAL STATUS · ALL NOMINAL'}
             </span>
           </div>
-          <div className="crit-metric-divider" aria-hidden="true" />
-          <div className="crit-metric">
-            <span className="crit-metric-lbl">Status</span>
-            <Badge variant="warn">OPEN</Badge>
+          {incident && (
+            <button
+              id="cmd-view-incident-btn"
+              className="btn-primary-danger"
+              onClick={onViewIncident}
+              aria-label="View incident details"
+            >
+              View Incident
+              <ChevronRight size={14} strokeWidth={2} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        <div className="crit-body">
+          {incident ? (
+            <>
+              <div className="crit-header-block">
+                <div>
+                  <div className="crit-type">{incident.type?.replace('_', ' ')?.toUpperCase() ?? 'WATER LEAK'}</div>
+                  <div className="crit-loc">
+                    {incident.zone?.name ?? 'Unknown Zone'} · Sensor: {incident.zone?.code ?? '—'}
+                  </div>
+                </div>
+                <div className="crit-priority-badge">
+                  <Badge variant="danger">PRIORITY 1</Badge>
+                </div>
+              </div>
+
+              <div className="crit-metrics">
+                <div className="crit-metric">
+                  <span className="crit-metric-lbl">Flow Rate</span>
+                  <span className="crit-metric-val">{details.avg_flow_lpm ?? '—'} L/min</span>
+                </div>
+                <div className="crit-metric-divider" aria-hidden="true" />
+                <div className="crit-metric">
+                  <span className="crit-metric-lbl">Duration</span>
+                  <span className="crit-metric-val">{fmtDuration(durationMin)}</span>
+                </div>
+                <div className="crit-metric-divider" aria-hidden="true" />
+                <div className="crit-metric">
+                  <span className="crit-metric-lbl">Est. Water Loss</span>
+                  <span className="crit-metric-val crit-metric-val--danger">
+                    {details.estimated_liters ?? details.wasted_liters ?? '—'} L
+                  </span>
+                </div>
+                <div className="crit-metric-divider" aria-hidden="true" />
+                <div className="crit-metric">
+                  <span className="crit-metric-lbl">Status</span>
+                  <Badge variant="warn">OPEN</Badge>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="po-nominal-state">
+              <span className="po-nominal-title">All Systems Nominal</span>
+              <span className="po-nominal-desc">No active leaks, threshold breaches, or critical alarms detected across facility zones.</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 35%: Active Dispatch / immediate action */}
+      <div className="po-dispatch-card" role="region" aria-label="Active dispatch immediate action">
+        <div className="po-dispatch-topbar">
+          <div className="crit-topbar-left">
+            <StatusDot status={ticket ? (ticket.priority === 'CRITICAL' ? 'danger' : 'warn') : 'ok'} label="Immediate dispatch status" />
+            <span className="po-dispatch-ref-label">
+              {ticket
+                ? `ACTIVE DISPATCH · ${ticket.ticket_id?.slice(0, 8).toUpperCase() ?? 'PENDING'}`
+                : 'DISPATCH QUEUE · STANDBY'}
+            </span>
           </div>
+          {ticket && (
+            <button
+              id="cmd-view-dispatch-btn"
+              className="btn-ghost-sm"
+              onClick={onViewDispatch}
+              aria-label="View active dispatch work order"
+            >
+              Inspect
+              <ChevronRight size={12} strokeWidth={2} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+
+        <div className="po-dispatch-body">
+          {ticket ? (
+            <>
+              <div className="po-dispatch-header">
+                <div>
+                  <div className="po-dispatch-team">
+                    {ticket.assigned_team?.replace('-', ' ')?.toUpperCase() ?? 'FACILITIES RESPONSE'}
+                  </div>
+                  <div className="po-dispatch-loc">
+                    Target: {ticket.zone?.code ?? '—'} · {ticket.zone?.name ?? 'Assigned Zone'}
+                  </div>
+                </div>
+                <Badge variant={ticket.priority === 'CRITICAL' ? 'danger' : 'warn'}>
+                  {ticket.priority || 'HIGH'}
+                </Badge>
+              </div>
+
+              <div className="po-dispatch-action-box">
+                <span className="po-dispatch-action-lbl">Immediate Action Protocol</span>
+                <p className="po-dispatch-action-text">
+                  {ticket.recommended_action || 'Inspect fixtures and isolate shutoff valve immediately.'}
+                </p>
+              </div>
+
+              <div className="po-dispatch-meta-row">
+                <div className="po-dispatch-meta-item">
+                  <span className="po-dispatch-meta-lbl">Status</span>
+                  <Badge variant={ticketStatusVariant(ticket.status)}>
+                    {ticket.status?.replace('_', ' ') ?? 'OPEN'}
+                  </Badge>
+                </div>
+                <div className="po-dispatch-meta-item">
+                  <span className="po-dispatch-meta-lbl">Response SLA</span>
+                  <span className="po-dispatch-meta-val">&lt; 15 min</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="po-nominal-state">
+              <span className="po-nominal-title">Standby Mode</span>
+              <span className="po-nominal-desc">No emergency dispatches queued. Rapid response technicians on standby.</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -423,6 +518,7 @@ export default function CommandCenter() {
   const { data: incidentsData } = useIncidents({ status: 'OPEN', priority: 'CRITICAL', limit: 1 });
   const { data: ticketsData } = useTickets({ status: 'OPEN', limit: 5 });
   const { data: water } = useWater();
+  const { data: waterAnalytics, loading: waLoading } = useWaterAnalytics();
 
   const isInitialLoading = dashLoading && !dashboard;
   const zones = zonesData?.data ?? [];
@@ -484,34 +580,67 @@ export default function CommandCenter() {
         </div>
       ) : (
         <>
-          {/* Operations KPI Console */}
+          {/* 1. TOP — EXISTING KPI STRIP (5-column 20% desktop grid) */}
           <KpiConsole dashboard={dashboard} water={water} />
 
-          {/* Critical Incident Alert */}
-          <CriticalAlert
+          {/* 2. PRIMARY OPERATIONS — immediately below KPIs (65% / 35% split) */}
+          <PrimaryOperations
             incident={criticalIncident}
-            onView={() => setSelectedIncident(criticalIncident)}
+            ticket={modalTicket}
+            onViewIncident={() => setSelectedIncident(criticalIncident)}
+            onViewDispatch={() => {
+              if (criticalIncident) {
+                setSelectedIncident(criticalIncident);
+              } else if (modalTicket?.incident) {
+                setSelectedIncident(modalTicket.incident);
+              } else if (modalTicket) {
+                setSelectedIncident({
+                  incident_id: modalTicket.ticket_id,
+                  type: 'DISPATCH',
+                  zone: modalTicket.zone,
+                  priority: modalTicket.priority,
+                  status: modalTicket.status,
+                });
+              }
+            }}
           />
 
-          {/* Main Operations Body */}
-          <div className="cc-body-grid">
-            <div className="cc-col-left">
-              {zonesLoading && zones.length === 0 ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                  <Spinner />
-                </div>
-              ) : (
-                <FacilityStatus zones={zones} onSelectZone={handleSelectZone} />
-              )}
+          {/* 3. FACILITY PERFORMANCE (2-column 50% / 50% grid) */}
+          <section className="cc-facility-performance" aria-labelledby="facility-perf-heading">
+            <SectionHeader title="Facility Performance" />
+            <div className="cc-analytics-grid">
+              {/* Row 1: Water Analytics (50%) | Incident Analytics (50%) */}
+              <WaterAnalytics data={waterAnalytics} loading={waLoading} />
+              <IncidentAnalytics />
+              {/* Row 2: Cleaning & Usage Analytics (50%) | Maintenance Analytics (50%) */}
+              <CleaningAnalytics />
+              <MaintenanceAnalytics tickets={tickets} />
             </div>
-            <div className="cc-col-right">
-              <MaintenancePreview
-                tickets={tickets}
-                onViewAll={() => navigate('/maintenance')}
-              />
-              <SustainabilitySummary water={water} />
-            </div>
-          </div>
+          </section>
+
+          {/* 4. TERMINAL & ZONE PERFORMANCE (Full available width: 100%) */}
+          <section className="cc-full-section" aria-labelledby="facility-status-heading">
+            {zonesLoading && zones.length === 0 ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                <Spinner />
+              </div>
+            ) : (
+              <FacilityStatus zones={zones} onSelectZone={handleSelectZone} />
+            )}
+          </section>
+
+          {/* 5. MAINTENANCE & DISPATCH (Detailed operational section below zone performance) */}
+          <section className="cc-full-section" aria-labelledby="maint-heading">
+            <MaintenancePreview
+              tickets={tickets}
+              onViewAll={() => navigate('/maintenance')}
+            />
+          </section>
+
+          {/* 6. SUSTAINABILITY (Toward the bottom) */}
+          <section className="cc-full-section" aria-labelledby="sustain-heading">
+            <SustainabilitySummary water={water} />
+          </section>
         </>
       )}
 
